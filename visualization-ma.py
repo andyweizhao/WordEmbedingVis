@@ -159,10 +159,10 @@ def plot_semantic_tree(stree, t, ax3, X, Y, word, colors, bg_alpha=0.1, labeled=
     # draw center
     c_ = stree.c_
     if labeled:
-        ax3.scatter(t, c_[0], c_[1], s=50, color='r', marker='o')
+        ax3.scatter(t, c_[0], c_[1], s=80, c='black', alpha=0.7, marker='s', facecolors='None')
     else:
-        ax3.scatter(t, c_[0], c_[1], s=50, color='r', marker='o', label='static embedding')
-    ax3.text(t, c_[0], c_[1], s=word)
+        ax3.scatter(t, c_[0], c_[1], s=80, c='black', alpha=0.7, marker='s', label='centroid of $\mathcal{C}_w$', facecolors='None')
+    ax3.text(t, c_[0] , c_[1] + 0.6, s=word, c='black', alpha=0.7)
     # ax3.text(t, c_[0], c_[1], s='mouse')
     # ax3.text(t, c_[0], c_[1], s='Maus')
     # ax3.text(t, c_[0], c_[1], s='mus')
@@ -178,41 +178,50 @@ def plot_semantic_tree(stree, t, ax3, X, Y, word, colors, bg_alpha=0.1, labeled=
 
     for cid, clu_center in enumerate(stree.subse_):
         if len(stree.subse_) > 1:
-            ax3.text(t, clu_center[0], clu_center[1], s=word+'_'+str(cid), alpha=0.9)
+#            ax3.text(t, clu_center[0] + 0.1, clu_center[1] + 0.9, s=word+str(cid), alpha=0.9)
+            ax3.text(t, clu_center[0] + 0.1, clu_center[1] + 0.9, s='', alpha=0.9)
         if labeled:
-            ax3.scatter(t, clu_center[0], clu_center[1], alpha=0.8, c='#C71585', s=30, marker='o')
+            if cid == 0:               
+                ax3.scatter(t, clu_center[0], clu_center[1], c='blue', alpha=0.7, s=80, marker='o')
+            else:
+                ax3.scatter(t, clu_center[0], clu_center[1], c='black', alpha=0.7, s=80, marker='o')
         else:
-            ax3.scatter(t, clu_center[0], clu_center[1], alpha=0.8, c='#C71585', s=30, marker='o',
-                        label='polysemy embedding')
+            ax3.scatter(t, clu_center[0], clu_center[1], c='black', alpha=0.7, s=80, marker='o', label='centroid of meaning group')
         sub_nbs_c_ = stree.subse_nbs_[cid]
-        # plot line
+        # plot line 
         x = [t, t]
         y = [c_[0], clu_center[0]]
         z = [c_[1], clu_center[1]]
-        ax3.plot3D(xs=x, ys=y, zs=z, color=line_colors[1], alpha=0.9)
+        ax3.plot3D(xs=x, ys=y, zs=z, color='grey', alpha=0.7)
         max_l = max_clu_line_len(sub_nbs_c_, clu_center)
-        for i in range(sub_nbs_c_.shape[0]):
-            point = sub_nbs_c_[i, :]
-            point = nbs_point_position_assign(point, clu_center, max_l)
-            if labeled:
-                ax3.scatter(t, point[0], point[1], alpha=0.8, color='#1E90FF', s=22, marker='*')
-            else:
-                ax3.scatter(t, point[0], point[1], alpha=0.8, color='#1E90FF', s=22, marker='*',
-                            label='neighbor embedding')
-            labeled = True
-            nb_w = stree.subse_nbs[cid][i]
+        for i in range(sub_nbs_c_.shape[0]):            
             # temp for mark sc change branch
             # sc_wset = ['mousepad', 'keyboard', 'computer', 'Mouse', 'user']
             sc_wset = ['mousepad', 'keyboard', 'computer', 'Mouse', 'user']
-            if nb_w in sc_wset:
-                ax3.text(t, point[0]-0.3, point[1]+0.12, s=nb_w, c='darkorange')
+            nb_w = stree.subse_nbs[cid][i]            
+            point = sub_nbs_c_[i, :]
+            point = nbs_point_position_assign(point, clu_center, max_l)
+            if labeled:
+                if nb_w in sc_wset:
+                    ax3.scatter(t, point[0], point[1], alpha=0.7, color='blue', s=80, marker='^')    
+                else:
+                    ax3.scatter(t, point[0], point[1], alpha=0.7, color='black', s=80, marker='^')
             else:
-                ax3.text(t, point[0]-0.3, point[1]+0.12, s=nb_w, alpha=0.7)
+                ax3.scatter(t, point[0], point[1], alpha=0.7, color='black', s=80, marker='^',
+                            label='centroid of neighbors')
+#            ax3.set_facecolor('none')
+            labeled = True
+#            nb_w = stree.subse_nbs[cid][i]            
+            if nb_w in sc_wset:
+#                ax3.text(t, point[0]+0.2, point[1]+0.1, s=nb_w, c='#d62728', alpha=0.7)
+                ax3.text(t, point[0]+0.2, point[1]+0.1, s=nb_w, c='black', alpha=0.7)
+            else:
+                ax3.text(t, point[0]+0.2, point[1]+0.1, s=nb_w, c='black', alpha=0.7)
             # plot line
             x = [t, t]
             y = [point[0], clu_center[0]]
             z = [point[1], clu_center[1]]
-            ax3.plot3D(xs=x, ys=y, zs=z, color=line_colors[2], alpha=0.9)
+            ax3.plot3D(xs=x, ys=y, zs=z, c='grey', alpha=0.7)
         # clu_cloud = stree.subse_cloud_[cid]
         # for i in range(clu_cloud.shape[0]):
         #     point = clu_cloud[i, :]
@@ -238,7 +247,7 @@ def plot_semantic_tree(stree, t, ax3, X, Y, word, colors, bg_alpha=0.1, labeled=
 def plot_3d_semantic_tree():
     # clu_size 是影响PCA选点的，不同的点集PCA结果不一样，可能是自由旋转的。
     word = 'mouse'
-    stree, stree2 = load_semantic_tree(k=5, clu_size=20)
+    stree, stree2 = load_semantic_tree(k=5, clu_size=25)
     print(stree.subse_nbs)
     print(stree2.subse_nbs)
     # return
@@ -254,13 +263,15 @@ def plot_3d_semantic_tree():
     colors = sns.color_palette('colorblind')
 
     plt.rcParams.update({
-        "font.family": "serif",
-        "font.size": 15,
+        "text.usetex": True,
+        "font.family": "sans-serif",
+        "font.size": 22,
+        'text.latex.preamble': r'\usepackage{amsfonts}'
     })
 
-    fig3 = plt.figure(8, figsize=(10, 10))
+    fig3 = plt.figure(8, figsize=(18, 18))
     ax3 = plt.subplot(projection='3d')
-    ax3.set_xlim(lim_min, lim_max)
+    ax3.set_xlim(lim_min , lim_max)
     ax3.set_ylim(lim_min, lim_max)
     ax3.set_zlim(lim_min, lim_max)
     x = np.arange(lim_min, lim_max, (ax_max - ax_min) / 50)
@@ -276,12 +287,12 @@ def plot_3d_semantic_tree():
     x = [t1, t2]
     y = [stree2.c_[0], stree.c_[0]]
     z = [stree2.c_[1], stree.c_[1]]
-    ax3.plot3D(xs=x, ys=y, zs=z, color=colors[0], alpha=0.2)
+    ax3.plot3D(xs=x, ys=y, zs=z, color='grey', alpha=0.7)
 
     # ax3.text(t1, lim_min, lim_min, s='t1', fontsize=10,)
     # ax3.text(t2, lim_min, lim_min, s='t2', fontsize=10,)
-    ax3.text(t1, lim_min, lim_min, s='t-1')
-    ax3.text(t2, lim_min, lim_min, s='t')
+    ax3.text(t1, lim_min, lim_min, s='$t-1$')
+    ax3.text(t2, lim_min, lim_min, s='$t$')
 
     ax3.grid(False)#不显示3d背景网格
     ax3.set_xticks([])#不显示x坐标轴
@@ -297,13 +308,13 @@ def plot_3d_semantic_tree():
     # plt.title('Semantic Tree for Word \'mouse\'')
     # plt.legend(bbox_to_anchor=(0.95, 0.8))
     # plt.legend(frameon=False, loc=(0, 0.1), ncol=3, columnspacing=0.1, labelspacing=0.1, fontsize=14)
-    plt.legend(frameon=False, loc=(0.05, 0.1), ncol=3, columnspacing=0, handletextpad=0, fontsize=15)
+    plt.legend(frameon=False, loc=(0.22, 0.15), ncol=3, columnspacing=0, handletextpad=0)
     # plt.legend(frameon=False, loc=(-0.2, -0.2), ncol=3, fontsize=16)
     save_path = './data/crossdiffusion/'
-    plt.savefig(save_path+"mouse.pdf")
+    plt.savefig(save_path+"mouse.pdf", bbox_inches='tight')
     plt.show()
 
-    fig3 = plt.figure(3, figsize=(10, 10))
+    fig3 = plt.figure(3, figsize=(18, 18))
     ax_ = plt.subplot(projection='3d')
     ax_.grid(False)#不显示3d背景网格
     ax_.set_xticks([])#不显示x坐标轴
@@ -316,8 +327,8 @@ def plot_3d_semantic_tree():
     # ax_.view_init(elev=0, azim=0, roll=0)
     ax_.view_init(elev=0, azim=0)
     # plt.legend(bbox_to_anchor=(0.8, 0.7))
-    plt.legend(frameon=False, loc=(0.05, 0.26), ncol=3, columnspacing=0, handletextpad=0, fontsize=15)
-    plt.savefig(save_path+"mouse-tree.pdf")
+    plt.legend(frameon=False, loc=(0.18, 0.33), ncol=3, columnspacing=0, handletextpad=0)
+    plt.savefig(save_path+"mouse-tree.pdf", bbox_inches='tight')
     plt.show()
 
 
